@@ -10,15 +10,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import static com.joelmofraga.artists_albums_api.config.ApiPaths.*;
 
 
 @Tag(name = "Auth", description = "Endpoints de autenticação (login e registro)")
 @RestController
-@RequestMapping("/auth")
+@RequestMapping(AUTH)
 public class AuthController {
 
     private final AuthService authService;
@@ -56,6 +54,31 @@ public class AuthController {
             @RequestBody LoginRequest request
     ) {
         return ResponseEntity.ok(authService.login(request));
+    }
+
+    @Operation(
+            summary = "Registrar usuário",
+            description = "Cria um novo usuário e atribui a role padrão USER."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Usuário criado com sucesso", content = @Content),
+            @ApiResponse(responseCode = "400", description = "Requisição inválida", content = @Content),
+            @ApiResponse(responseCode = "409", description = "Username já existe", content = @Content)
+    })
+    @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> register(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Dados para criação do usuário",
+                    required = true,
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = RegisterRequest.class)
+                    )
+            )
+            @RequestBody RegisterRequest request
+    ) {
+        authService.register(request);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/refresh")

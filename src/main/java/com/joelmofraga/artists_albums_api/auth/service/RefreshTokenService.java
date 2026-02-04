@@ -41,10 +41,7 @@ public class RefreshTokenService {
         return new Issued(raw, rt.getExpiresAt());
     }
 
-    /**
-     * Valida e ROTACIONA: revoga o refresh atual.
-     * Retorna o userId dono do token para emitir novos tokens.
-     */
+
     public Long validateAndRevoke(String rawRefreshToken) {
         String hash = sha256Base64(rawRefreshToken);
 

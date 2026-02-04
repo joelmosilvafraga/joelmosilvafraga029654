@@ -22,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class AuthService {
 
-    // ✅ Padronize o banco com ROLE_USER / ROLE_ADMIN
     private static final String DEFAULT_ROLE_CODE = "ROLE_USER";
 
     private final AuthenticationManager authenticationManager;

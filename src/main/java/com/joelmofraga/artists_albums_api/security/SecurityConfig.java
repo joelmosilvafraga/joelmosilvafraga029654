@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import static com.joelmofraga.artists_albums_api.config.ApiPaths.AUTH;
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
@@ -35,7 +36,7 @@ public class SecurityConfig {
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(eh -> eh.authenticationEntryPoint(authEntryPoint))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**").permitAll() // <-- AQUI
+                        .requestMatchers(AUTH + "/**").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .requestMatchers(HttpMethod.GET, "/actuator/health").permitAll()
                         .anyRequest().authenticated()
