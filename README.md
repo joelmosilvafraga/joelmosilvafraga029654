@@ -1,75 +1,205 @@
-# Projeto - Artists & Albums API
+# Artists & Albums API
 
-### REST API para gerenciamento de Artistas, Álbuns, Músicas e Capas.
+API REST para gerenciamento de artistas, álbuns, faixas e capas de álbum, com autenticação JWT, refresh token, upload em storage S3 (MinIO) e notificações WebSocket.
 
-Esta API foi desenvolvida como parte do processo seletivo para **Engenheiro de Computação** realizado pela **SEPLAG**. O projeto demonstra a aplicação prática de requisitos técnicos de alto nível, com foco em escalabilidade, segurança e boas práticas de arquitetura.
-Link com alguns detalhes do projeto: [https://drive.google.com/file/d/1tFU9LdoP5ODQCzQ3WfwBz8pqwgO_8VnL/view?usp=sharing](https://drive.google.com/file/d/1tFU9LdoP5ODQCzQ3WfwBz8pqwgO_8VnL/view?usp=sharing)
----
+## ✨ Funcionalidades
 
-## 🚀 Sobre o Projeto
-
-O backend foi construído utilizando **Java 17 + Spring Boot**, adotando uma arquitetura em camadas e divisão por funcionalidades (features). A persistência utiliza PostgreSQL com migrações versionadas, e o armazenamento de mídias é feito de forma desacoplada via protocolo S3 (MinIO).
-
-### Diferenciais Implementados:
-- **Arquitetura:** Camadas (Controller → Service → Repository) com foco em domínio/feature.
-- **Segurança:** Autenticação Stateless com JWT e suporte a Refresh Token.
-- **Upload de Arquivos:** Integração com Storage S3-compatible (MinIO).
-- **Infraestrutura:** Ambiente totalmente dockerizado.
-- **Qualidade:** Testes automatizados e documentação interativa via Swagger.
+- Autenticação com **JWT** e **refresh token**.
+- Cadastro e manutenção de **artistas**.
+- Cadastro e manutenção de **álbuns** com associação a artistas.
+- Cadastro em lote e listagem de **faixas por álbum**.
+- Upload de **capa de álbum** em storage S3-compatible (MinIO).
+- Geração de URL **pré-assinada** para download da capa.
+- **Rate limit** para login e para chamadas autenticadas.
+- Notificação em tempo real via **WebSocket/STOMP** quando álbum é criado.
+- Documentação interativa com **Swagger/OpenAPI**.
 
 ---
 
-## 🛠️ Stack Tecnológica
+## 🧱 Stack
 
-| Categoria | Tecnologia |
-|-----------|-----------|
-| **Backend** | Java 17, Spring Boot 3 |
-| **Segurança** | Spring Security + JWT |
-| **Banco de Dados** | PostgreSQL |
-| **ORM / Migrations** | Spring Data JPA (Hibernate) / Flyway |
-| **Storage** | MinIO (S3 compatible) |
-| **Documentação** | Swagger / OpenAPI 3 |
-| **Testes** | JUnit 5 + Mockito |
-| **Containerização** | Docker / Docker Compose |
-
----
-
-## 🏗️ Arquitetura e Fluxo
-
-A aplicação segue o fluxo clássico de responsabilidades:
-`Controller → Service → Repository → Database`
-
-Para mídias:
-`Controller → Service → Storage Service → S3 (MinIO)`
-
-### Responsabilidades por Camada
-* **Controller:** Gerenciamento de protocolos HTTP, mapeamento de DTOs e validação de entrada.
-* **Service:** Implementação das regras de negócio e orquestração de processos.
-* **Repository:** Abstração da camada de persistência.
-* **Security:** Filtros de autenticação, autorização e geração/validação de tokens.
-* **Storage:** Lógica de integração para upload/download de mídias no S3.
+- Java 17
+- Spring Boot 4
+- Spring Security (JWT)
+- Spring Data JPA + Hibernate
+- Flyway
+- PostgreSQL
+- MinIO (S3-compatible)
+- Spring WebSocket (STOMP)
+- JUnit 5 + Mockito
+- Docker / Docker Compose
 
 ---
 
-## ✅ Status do projeto
+## 📁 Estrutura resumida
 
-- [x] Autenticação (JWT + Refresh Token)
-- [x] CRUD de Artistas
-- [x] CRUD de Álbuns
-- [x] Upload de capa de álbum (MinIO)
-- [x] Link pré-assinado para download (30 min)
-- [x] Cadastro de músicas (batch) e consulta por álbum
-- [x] Paginação nas consultas
-- [x] Rate limit por usuário
+A aplicação segue arquitetura em camadas por feature:
 
-## ⚙️ Executando o Projeto
+- `controller`: endpoints HTTP
+- `service`: regras de negócio
+- `repository`: acesso a dados
+- `domain`: entidades de negócio
+- `dto`: contratos de entrada/saída
+- `security`: autenticação/autorização e filtros
 
-### 1. Subir a Infraestrutura (Docker)
-Certifique-se de ter o Docker instalado e execute:
-docker compose up -d
+---
 
-Serviços disponíveis:
+## ▶️ Como executar
 
-* Postgres: localhost:5432 (user/pass: postgres/postgres)
-* MinIO API: http://localhost:9000 (admin/admin123)
-* MinIO Console: http://localhost:9001
+### Pré-requisitos
+
+- Docker e Docker Compose
+- (Opcional) Java 17 + Maven para execução local fora de containers
+
+### 1) Subir toda a stack via Docker
+
+```bash
+docker compose up -d --build
+```
+
+Serviços expostos:
+
+- API: `http://localhost:8080`
+- PostgreSQL: `localhost:5432`
+- MinIO API: `http://localhost:9000`
+- MinIO Console: `http://localhost:9001`
+
+### 2) Variáveis de ambiente esperadas
+
+O `docker-compose.yml` lê as variáveis de `.env`:
+
+```env
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+POSTGRES_DB=appdb
+
+MINIO_USER=admin
+MINIO_PASS=admin123
+
+JWT_SECRET=troque-por-um-segredo-forte
+JWT_EXP_MINUTES=5
+```
+
+> O bucket S3 padrão usado pela API é `app-images`.
+
+### 3) Rodar localmente (sem container da API)
+
+Com PostgreSQL e MinIO já disponíveis:
+
+```bash
+./mvnw spring-boot:run
+```
+
+---
+
+## 📚 Documentação da API
+
+Com a aplicação no ar:
+
+- Swagger UI: `http://localhost:8080/swagger-ui/index.html`
+- OpenAPI JSON: `http://localhost:8080/v3/api-docs`
+
+Base path da API:
+
+- `/api/v1`
+
+---
+
+## 🔐 Autenticação e perfis
+
+### Endpoints de auth
+
+- `POST /api/v1/auth/register`
+- `POST /api/v1/auth/login`
+- `POST /api/v1/auth/refresh`
+
+### Usuários iniciais (migração)
+
+Senha padrão para todos os usuários abaixo: `123456`
+
+- `administrador` → role `ADMIN`
+- `usuario_gestor` → role `MANAGER`
+- `usuario_editor` → role `EDITOR`
+- `usuario_1` → role `USER`
+- `usuario_2` → role `USER`
+
+### Regras de autorização (resumo)
+
+- Artistas:
+  - Criar e atualizar: `ADMIN`
+  - Consultas: autenticado
+- Álbuns:
+  - Criar/atualizar: `ADMIN` ou `MANAGER`
+  - Buscar por ID: `ADMIN`, `MANAGER` ou `EDITOR`
+  - Listagens e buscas: autenticado
+- Tracks e mídia:
+  - Endpoints autenticados
+
+Use o token JWT no header:
+
+```http
+Authorization: Bearer <seu_token>
+```
+
+---
+
+## 🧪 Endpoints principais
+
+### Artists
+
+- `POST /api/v1/artists`
+- `GET /api/v1/artists`
+- `GET /api/v1/artists/search?name=`
+- `GET /api/v1/artists/{id}`
+- `PUT /api/v1/artists/{id}`
+
+### Albums
+
+- `POST /api/v1/albums`
+- `GET /api/v1/albums`
+- `GET /api/v1/albums/{id}`
+- `PUT /api/v1/albums/{id}`
+- `GET /api/v1/albums/by-title/{title}`
+- `GET /api/v1/albums/by-artist?name=`
+
+### Tracks (por álbum)
+
+- `POST /api/v1/albums/{albumId}/tracks/batch`
+- `GET /api/v1/albums/{albumId}/tracks`
+
+### Mídia de capa
+
+- `POST /api/v1/media/{albumId}/cover` (multipart/form-data)
+- `GET /api/v1/media/{albumId}/cover`
+
+---
+
+## 📡 WebSocket
+
+- Endpoint STOMP: `/ws`
+- Tópico de publicação de novo álbum: `/topic/albums/created`
+
+---
+
+## 🩺 Healthcheck
+
+- `GET /actuator/health`
+- `GET /actuator/info`
+
+---
+
+## ✅ Testes
+
+Executar testes automatizados:
+
+```bash
+./mvnw test
+```
+
+---
+
+## Observações
+
+- As migrações Flyway são aplicadas na inicialização.
+- O bucket S3 é verificado/criado automaticamente na subida da aplicação.
+- Projeto desenvolvido no contexto de avaliação técnica (SEPLAG).
