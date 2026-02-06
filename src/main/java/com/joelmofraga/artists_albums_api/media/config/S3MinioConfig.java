@@ -16,7 +16,9 @@ import java.net.URI;
 public class S3MinioConfig {
 
     private StaticCredentialsProvider creds(String accessKey, String secretKey) {
-        return StaticCredentialsProvider.create(AwsBasicCredentials.create(accessKey, secretKey));
+        return StaticCredentialsProvider.create(
+                AwsBasicCredentials.create(accessKey, secretKey)
+        );
     }
 
     private S3Configuration s3Config() {
@@ -25,9 +27,10 @@ public class S3MinioConfig {
                 .build();
     }
 
+
     @Bean
     public S3Client s3Client(
-            @Value("${storage.s3.endpoint}") String endpoint,
+            @Value("${storage.s3.endpoint.internal}") String endpoint,
             @Value("${storage.s3.region}") String region,
             @Value("${storage.s3.access-key}") String accessKey,
             @Value("${storage.s3.secret-key}") String secretKey
@@ -40,9 +43,10 @@ public class S3MinioConfig {
                 .build();
     }
 
+
     @Bean
     public S3Presigner s3Presigner(
-            @Value("${storage.s3.endpoint}") String endpoint,
+            @Value("${storage.s3.endpoint.external}") String endpoint,
             @Value("${storage.s3.region}") String region,
             @Value("${storage.s3.access-key}") String accessKey,
             @Value("${storage.s3.secret-key}") String secretKey
