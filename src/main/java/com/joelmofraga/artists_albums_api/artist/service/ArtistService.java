@@ -101,7 +101,7 @@ public class ArtistService {
         artist.setCountry(request.getCountry() != null ? request.getCountry().trim() : null);
         artist.setGenre(request.getGenre() != null ? request.getGenre().trim() : null);
 
-        Artist saved = artistRepository.save(artist); // @PreUpdate ajusta updatedAt
+        Artist saved = artistRepository.save(artist);
         return toResponse(saved);
     }
 

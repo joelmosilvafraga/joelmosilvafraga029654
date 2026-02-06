@@ -7,6 +7,8 @@ import com.joelmofraga.artists_albums_api.album.dto.AlbumResponse;
 import com.joelmofraga.artists_albums_api.album.dto.AlbumUpdateRequest;
 import com.joelmofraga.artists_albums_api.album.repository.AlbumRepository;
 import com.joelmofraga.artists_albums_api.album.repository.AlbumTypeRepository;
+import com.joelmofraga.artists_albums_api.websocket.dto.AlbumCreatedEvent;
+import com.joelmofraga.artists_albums_api.websocket.notifier.AlbumWsNotifier;
 import jakarta.persistence.criteria.JoinType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,15 +25,21 @@ public class AlbumService {
 
     private final AlbumRepository albumRepository;
     private final AlbumTypeRepository albumTypeRepository;
+    private final AlbumWsNotifier notifier;
 
-    public AlbumService(AlbumRepository albumRepository, AlbumTypeRepository albumTypeRepository) {
+    public AlbumService(
+            AlbumRepository albumRepository,
+            AlbumTypeRepository albumTypeRepository,
+            AlbumWsNotifier notifier
+    ) {
         this.albumRepository = albumRepository;
         this.albumTypeRepository = albumTypeRepository;
+        this.notifier = notifier;
     }
-
 
     @Transactional
     public AlbumResponse create(AlbumCreateRequest request) {
+
         AlbumType type = albumTypeRepository.findByCodeIgnoreCase(request.getAlbumTypeCode().trim())
                 .filter(AlbumType::getActive)
                 .orElseThrow(() -> new ResponseStatusException(
@@ -46,9 +54,19 @@ public class AlbumService {
         album.setAlbumType(type);
 
         Album saved = albumRepository.save(album);
+
+
+        notifier.notifyAlbumCreated(
+                new AlbumCreatedEvent(
+                        saved.getId(),
+                        saved.getTitle(),
+                        saved.getReleaseYear(),
+                        saved.getCreatedAt()
+                )
+        );
+
         return toResponse(saved);
     }
-
 
     @Transactional(readOnly = true)
     public AlbumResponse getById(Long id) {

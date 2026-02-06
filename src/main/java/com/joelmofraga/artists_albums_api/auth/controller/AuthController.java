@@ -26,7 +26,7 @@ public class AuthController {
     }
 
     @Operation(
-            summary = "Login",
+            summary = "Login com usuário e senha",
             description = "Autentica o usuário e retorna um JWT (Bearer token)."
     )
     @ApiResponses(value = {
@@ -58,7 +58,7 @@ public class AuthController {
 
     @Operation(
             summary = "Registrar usuário",
-            description = "Cria um novo usuário e atribui a role padrão USER."
+            description = "Cria um novo usuário e atribui a role padrão USER. - Deverá ser ajustado em uma nova versão"
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Usuário criado com sucesso", content = @Content),

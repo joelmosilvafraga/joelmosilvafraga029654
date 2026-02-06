@@ -18,7 +18,7 @@ public class AlbumCreateRequest {
 
     @NotBlank
     @Size(max = 50)
-    private String albumTypeCode; // ex: STUDIO, LIVE, COMPILATION, EP, SINGLE
+    private String albumTypeCode;
 
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }

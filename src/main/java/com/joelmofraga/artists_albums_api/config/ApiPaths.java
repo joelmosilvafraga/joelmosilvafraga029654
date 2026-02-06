@@ -12,4 +12,5 @@ public final class ApiPaths {
     public static final String ARTISTS = V1 + "/artists";
     public static final String ALBUMS = V1 + "/albums";
     public static final String TRACKS = V1 + "/tracks";
+    public static final String MEDIA = V1 + "/media";
 }

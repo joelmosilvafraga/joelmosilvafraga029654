@@ -23,7 +23,7 @@ import java.util.List;
 
 import static com.joelmofraga.artists_albums_api.config.ApiPaths.ARTISTS;
 
-@Tag(name = "Artists", description = "Endpoints de artistas")
+@Tag(name = "Artists", description = "Operação de Cadastro e consulta de artistas")
 @RestController
 @RequestMapping(ARTISTS)
 public class ArtistController {
